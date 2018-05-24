@@ -44,3 +44,22 @@ class create_mnist_model(nn.Module):
         x = F.relu(self.fc1(x.view(-1,784)))
         x = self.fc2(x)
         return x
+    
+    
+def get_datasets(mini_batch_size=100):
+  transform = transforms.ToTensor()
+  transform=transforms.Compose([transforms.ToTensor(),
+                              transforms.Normalize((0.1307,), (0.3081,)),])  #these are the mean and std of MNIST
+  root = './data'
+  if not os.path.exists(root):
+    os.mkdir(root)
+  # Load and transform data
+  train_dataset = torchvision.datasets.MNIST(root, train=True, download=True, transform=transform)
+  train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, shuffle=True, num_workers=2)
+  
+  
+
+  test_dataset = torchvision.datasets.MNIST(root, train=False, download=True, transform=transform)
+  test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=mini_batch_size, shuffle=False, num_workers=2)
+  return  train_dataset, train_loader, test_dataset, test_loader
+    

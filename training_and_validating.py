@@ -120,8 +120,11 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
   train_acc_kfold = []
   val_acc_kfold = []
   
+  fold_nb = 0
+  
   for train_index, val_index in kf.split(train_dataset.train_data):
-    print("New split of data")
+    print("Fold number: {}".format(fold_nb))
+    fold_nb +=1
     train_sampler = SubsetRandomSampler(train_index)
     val_sampler = SubsetRandomSampler(val_index)
 
@@ -157,7 +160,6 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
         print('At epoch number: {}'.format(epoch))
       # for this epoch calculate train loss, accuracy
       train_model(train_loader, model, criterion, optimizer)
-      print('epoch: {}'.format(epoch))
       # Store them in list to be able to plot
       if interstates == True and (epoch % 1 == 0 or epoch+1 == nb_epochs) :
           train_loss, train_acc = validate_model(train_loader, model, criterion)
@@ -167,14 +169,14 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
           val_loss, val_acc = validate_model(val_loader, model, criterion)
           val_e_loss.append(val_loss)    
           val_e_acc.append(val_acc)
-          print('train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(train_loss, val_loss, train_acc, val_acc))
+          print('epoch: {}, train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(epoch, train_loss, val_loss, train_acc, val_acc))
       
 
     # for k-fold sets, store loss and accuracy
     if interstates == False :
         val_e_loss, val_e_acc = validate_model(val_loader, model, criterion)
         train_e_loss, train_e_acc = validate_model(train_loader, model, criterion)
-        print('train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
+        print('End of fold; train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
         
     val_loss_kfold.append(val_e_loss)    
     val_acc_kfold.append(val_e_acc)
