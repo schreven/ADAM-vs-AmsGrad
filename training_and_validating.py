@@ -28,6 +28,7 @@ from sklearn.model_selection import KFold
 from torch.utils.data.sampler import SubsetRandomSampler
 import matplotlib.pyplot as plt
 import numpy as np
+
   
 from sklearn.model_selection import KFold
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -169,14 +170,14 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
           val_loss, val_acc = validate_model(val_loader, model, criterion)
           val_e_loss.append(val_loss)    
           val_e_acc.append(val_acc)
-          print('epoch: {}, train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(epoch, train_loss, val_loss, train_acc, val_acc))
+          print('epoch: {}, train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(epoch, train_loss, val_loss, train_acc, val_acc))
       
 
     # for k-fold sets, store loss and accuracy
     if interstates == False :
         val_e_loss, val_e_acc = validate_model(val_loader, model, criterion)
         train_e_loss, train_e_acc = validate_model(train_loader, model, criterion)
-        print('End of fold; train loss: {}, val loss: {}, train_acc: {}, val_acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
+        print('End of fold; train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
         
     val_loss_kfold.append(val_e_loss)    
     val_acc_kfold.append(val_e_acc)
@@ -188,16 +189,16 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
   return train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold
 
 
-def train_test(model, optimizer_, opt_parameters, train_dataset, test_dataset, shuffle=True, nb_epochs = 150, mini_batch_size = 100, lr = 1e-1):
+def train_test(model, optimizer_, opt_parameters, train_dataset, test_dataset, shuffle=True, nb_epochs = 150, mini_batch_size = 100, interstates = False):
   criterion = nn.CrossEntropyLoss()
-  optimizer = optim.SGD(model.parameters(), lr)
   
-  from torch.utils.data.sampler import SubsetRandomSampler
-
-  train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, sampler=train_sampler, drop_last=False)
+ # train_sampler = SubsetRandomSampler()
+ # val_sampler = SubsetRandomSampler()
+  
+  train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, drop_last=False) #sampler=train_sampler,
 #     print(len(train_loader))
 
-  test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=mini_batch_size, sampler=val_sampler, drop_last=False)
+  test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=mini_batch_size, drop_last=False)
 #     print(len(val_loader))
 
   model = create_mnist_model()
@@ -212,28 +213,40 @@ def train_test(model, optimizer_, opt_parameters, train_dataset, test_dataset, s
 
   if torch.cuda.is_available():
     criterion = nn.CrossEntropyLoss().cuda()
-  #optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
-  optimizer = optimizer_(model.parameters(), *opt_parameters)
+  if optimizer_ == optim.SGD:
+      optimizer = optimizer_(model.parameters(), *opt_parameters)
 
+  if optimizer_ == optim.Adam:
+      optimizer = optimizer_(model.parameters(), *opt_parameters[:-1], amsgrad = opt_parameters[-1])
+ 
   for epoch in range(0, nb_epochs):
-    if (epoch%10==0):
-      print(epoch)
-    # here we normalize data on train set and take mean and std for test set
-    train_loss, train_acc, mean, std = train_model(train_loader, model, criterion, optimizer)
-    # Store them in list to be able to plot
-    train_e_loss.append(train_loss)
-    train_e_acc.append(train_acc)
+      if (epoch%10==0):
+        print('At epoch number: {}'.format(epoch))
+      # for this epoch calculate train loss, accuracy
+      train_model(train_loader, model, criterion, optimizer)
+      # Store them in list to be able to plot
+      if interstates == True and (epoch % 1 == 0 or epoch+1 == nb_epochs) :
+          train_loss, train_acc = validate_model(train_loader, model, criterion)
+          train_e_loss.append(train_loss)    
+          train_e_acc.append(train_acc)
+          
+          test_loss, test_acc = validate_model(test_loader, model, criterion)
+          test_e_loss.append(test_loss)    
+          test_e_acc.append(test_acc)
+          print('epoch: {}, train loss: {}, test loss: {}, train acc: {}, test acc: {}'.format(epoch, train_loss, test_loss, train_acc, test_acc))
+      
 
-    # Evaluate for epoch val loss and accuracy
-    test_loss, test_acc = validate_model(test_loader, model, criterion, mean, std)
-    # Store them in the list to be able to plot
-    test_e_loss.append(test_loss)
-    test_e_acc.append(test_acc)
+    # for k-fold sets, store loss and accuracy
+  if interstates == False :
+        test_e_loss, test_e_acc = validate_model(test_loader, model, criterion)
+        train_e_loss, train_e_acc = validate_model(train_loader, model, criterion)
+        print('End of fold; train loss: {}, test loss: {}, train acc: {}, test acc: {}'.format(train_e_loss, test_e_loss, train_e_acc, test_e_acc))
+
     
     # for k-fold sets, store loss and accuracy through epochs 
-    train_loss_kfold.append(train_e_loss)
-    test_loss_kfold.append(test_e_loss)
-    train_acc_kfold.append(train_e_acc)
-    test_acc_kfold.append(test_e_acc)
+   # train_loss_kfold.append(train_e_loss)
+   # test_loss_kfold.append(test_e_loss)
+   # train_acc_kfold.append(train_e_acc)
+   # test_acc_kfold.append(test_e_acc)
     
-  return train_loss_kfold, test_loss_kfold, train_acc_kfold, test_acc_kfold
+  return train_e_loss, test_e_loss, train_e_acc, test_e_acc

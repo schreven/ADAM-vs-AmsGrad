@@ -23,8 +23,8 @@ import numpy as np
 
 from visualizing import plot_acc_loss
 from models import create_mnist_model, get_datasets
-from training_and_validating import train_validate_kfold
-from sweeps import grid_search_beta
+from training_and_validating import train_validate_kfold, train_test
+from sweeps import grid_search_lr, grid_search_beta
 
 
 ### SIMPLE SGD
@@ -51,7 +51,7 @@ np.save(os.path.join('arrays_and_images','1st_kf=5_epo=40_lr=1e-1_btch=100_SGD_i
 """
 
 """
-### GRID SEARCH SIMPLE ADAM
+### GRID SEARCH BETAS ADAM
 
 #grid_search_beta()
 res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_lr=1e-3_btch=100_Adam_beta1_beta2.npy'))
@@ -68,6 +68,19 @@ val_acc[2] = val_acc[3]
 val_acc[3] = tmp
 
 sns.heatmap(val_acc, xticklabels=np.reshape(np.array(beta2_list),(-1,1)), yticklabels=np.reshape(np.array(beta1_list),(-1,1))).set_title('Validating accuracy mean')
+plt.figure()
+"""
+
+"""
+### 'GRID' SEARCH LR ADAM
+
+grid_search_lr()
+res = np.load(os.path.join('arrays_and_images','grid_kf=4_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr.npy'))
+res = dict(res.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+num_lr = len(lr_list)
+val_acc = np.reshape(np.mean(res['val_acc'], axis=1))
+sns.heatmap(val_acc, xticklabels=np.reshape(np.array(lr_list),(-1,1)), yticklabels=np.reshape(np.array(lr_list),(-1,1))).set_title('Validating accuracy mean')
 plt.figure()
 """
 
@@ -96,7 +109,7 @@ save_array = [train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold]
 np.save(os.path.join('arrays_and_images','2nd_kf=4_epo=40_lr=1e-3_btch=100_Adam_inter'),save_array)
 """
 
-
+"""
 ### Improved ADAM: AMSGRAD
 model = create_mnist_model()
 kfold = 4
@@ -118,3 +131,75 @@ plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold)
 
 save_array = [train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold]
 np.save(os.path.join('arrays_and_images','3rd_kf=4_epo=40_lr=1e-3_btch=100_AMSGRAD_inter'),save_array)
+
+"""
+### SGD TESTING
+model = create_mnist_model()
+nb_epochs = 40
+lr = 1e-1
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+optimizer_ = optim.SGD
+opt_parameters_SGD = [lr]
+
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_SGD, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('SGD test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','4th_epo=40_lr=1e-1_btch=100_SGD_inter_testing'),save_array)
+
+
+### ADAM TESTING
+model = create_mnist_model()
+nb_epochs = 40
+lr = 1e-3
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+
+beta1, beta2 = 0.91, 0.999
+amsgrad = False
+optimizer_ = optim.Adam
+opt_parameters_Adam = [lr, (beta1, beta2), amsgrad]
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_Adam, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('ADAM test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','5th_epo=40_lr=1e-3_btch=100_Adam_inter_testing'),save_array)
+
+### AMSGRAD TESTING
+model = create_mnist_model()
+nb_epochs = 40
+lr = 1e-3
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+
+beta1, beta2 = 0.91, 0.999
+amsgrad = True
+optimizer_ = optim.Adam
+opt_parameters_Adam = [lr, (beta1, beta2), amsgrad]
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_Adam, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('ADAM test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','6th_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_testing'),save_array)
