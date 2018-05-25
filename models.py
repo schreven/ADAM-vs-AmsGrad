@@ -34,9 +34,9 @@ def create_mnist_model():
   )
   """
 
-class create_mnist_model(nn.Module):
+class create_1layer_model(nn.Module):
     def __init__(self):
-        super(create_mnist_model, self).__init__()
+        super(create_1layer_model, self).__init__()
         self.fc1 = nn.Linear(784, 100)
         self.fc2 = nn.Linear(100, 10)
 
@@ -44,6 +44,17 @@ class create_mnist_model(nn.Module):
         x = F.relu(self.fc1(x.view(-1,784)))
         x = self.fc2(x)
         return x
+    
+class create_convex_model(nn.Module):
+    def __init__(self):
+        super(create_convex_model, self).__init__()
+        self.fc1 = nn.Linear(784, 10)
+
+    def forward(self, x):
+        x = self.fc1(x)
+        return x
+    
+    
     
     
 def get_datasets(mini_batch_size=100):

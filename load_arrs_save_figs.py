@@ -28,7 +28,7 @@ plt.legend(['Train', 'Validation'])
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 
-pylab.savefig(os.path.join('arrays_and_images','first_vis.png'))
+pylab.savefig(os.path.join('arrays_and_images','first_vis__.png'))
 
 
 
@@ -40,7 +40,7 @@ plt.legend(['Train', 'Validation'])
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 
-pylab.savefig(os.path.join('arrays_and_images','second_vis.png'))
+pylab.savefig(os.path.join('arrays_and_images','second_vis__.png'))
 
 print('SGD: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
 
@@ -146,6 +146,39 @@ plt.semilogx(lr_list[:-1], val_acc[:-1])
 plt.title('Validating accuracy mean')
 pylab.savefig(os.path.join('arrays_and_images','lr_vis_2.png'))
 
+
+### SGD CONVEX
+save_array = np.load(os.path.join('arrays_and_images','1st_kf=5_epo=40_lr=1e-1_btch=100_SGD_inter_ro_convex.npy'))
+
+
+train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold = save_array
+
+
+plt.figure()
+title="MNIST loss"
+sns.tsplot(np.array(train_loss_kfold)).set_title(title)
+sns.tsplot(np.array(val_loss_kfold), color = 'r')
+plt.legend(['Train', 'Validation'])
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+
+pylab.savefig(os.path.join('arrays_and_images','first_vis_convex.png'))
+
+
+
+plt.figure()
+title="MNIST accuracy"
+sns.tsplot(np.array(train_acc_kfold)).set_title(title)
+sns.tsplot(np.array(val_acc_kfold), color = 'r')
+plt.legend(['Train', 'Validation'])
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+
+pylab.savefig(os.path.join('arrays_and_images','second_vis_convex.png'))
+
+print('SGD: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
+
+
 ############# REPORT ####################
 
 ### LOSS EPOCH SGD, ADAM, AMSGRAD
@@ -158,7 +191,7 @@ train_loss_kfold_adam, val_loss_kfold_adam, train_acc_kfold_adam, val_acc_kfold_
 train_loss_kfold_amsgrad, val_loss_kfold_amsgrad, train_acc_kfold_amsgrad, val_acc_kfold_amsgrad = save_array_amsgrad
 
 plt.figure()
-title="MNIST loss"
+title="MNIST, one layer:"
 plt.title(title)
 
 sns.tsplot(np.array(val_loss_kfold_adam), color = 'b', linestyle = '--')

@@ -29,11 +29,10 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import matplotlib.pyplot as plt
 import numpy as np
 
-  
+#from models import create_1layer_model
 from sklearn.model_selection import KFold
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from models import create_mnist_model
 
 
 def train_model(train_loader, model, criterion, optimizer):
@@ -48,8 +47,7 @@ def train_model(train_loader, model, criterion, optimizer):
         
         inputs = train_data
         targets = train_labels
-       # inputs = Variable(train_data)
-       # targets = Variable(train_labels)
+
         if torch.cuda.is_available():
           inputs = inputs.cuda()
           targets = targets.cuda()
@@ -111,7 +109,7 @@ def validate_model(val_loader, model, criterion):
     acc_epoch = float(nb_correct)/nb_elem
     return loss_epoch, acc_epoch
 
-def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold=5, shuffle=True, nb_epochs = 150, mini_batch_size = 100, interstates = False):
+def train_validate_kfold(model_, optimizer_, opt_parameters, train_dataset, kfold=5, shuffle=True, nb_epochs = 150, mini_batch_size = 100, interstates = False, run_once = False):
   criterion = nn.CrossEntropyLoss()
   kf = KFold(n_splits = kfold, shuffle=shuffle)
 
@@ -122,68 +120,73 @@ def train_validate_kfold(model, optimizer_, opt_parameters, train_dataset, kfold
   val_acc_kfold = []
   
   fold_nb = 0
-  
+  stop_running = False
+
   for train_index, val_index in kf.split(train_dataset.train_data):
-    print("Fold number: {}".format(fold_nb))
-    fold_nb +=1
-    train_sampler = SubsetRandomSampler(train_index)
-    val_sampler = SubsetRandomSampler(val_index)
-
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, sampler=train_sampler, drop_last=False)
-#     print(len(train_loader))
+    if stop_running != True:
+        if run_once:
+            stop_running = True
+            print(run_once, stop_running)
+        print("Fold number: {}".format(fold_nb))
+        fold_nb +=1
+        train_sampler = SubsetRandomSampler(train_index)
+        val_sampler = SubsetRandomSampler(val_index)
     
-    val_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, sampler=val_sampler, drop_last=False)
-#     print(len(val_loader))
-    
-    model = create_mnist_model()
-    if torch.cuda.is_available():
-      model = model.cuda()
-      #train_dataset.input, val_dataset.input = train_input.cuda(), train_target.cuda(),test_input.cuda(), test_target.cuda()
-
-    # Store loss and accuracy per each epoch
-    train_e_loss = []
-    val_e_loss = []
-    train_e_acc = []
-    val_e_acc = []
-    
-    if torch.cuda.is_available():
-      criterion = nn.CrossEntropyLoss().cuda()
-    #optimizer = optim.SGD(model.parameters(), lr)
-    #optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
-    if optimizer_ == optim.SGD:
-        optimizer = optimizer_(model.parameters(), *opt_parameters)
-    
-    if optimizer_ == optim.Adam:
-        optimizer = optimizer_(model.parameters(), *opt_parameters[:-1], amsgrad = opt_parameters[-1])
-    
-    for epoch in range(0, nb_epochs):
-      if (epoch%10==0):
-        print('At epoch number: {}'.format(epoch))
-      # for this epoch calculate train loss, accuracy
-      train_model(train_loader, model, criterion, optimizer)
-      # Store them in list to be able to plot
-      if interstates == True and (epoch % 1 == 0 or epoch+1 == nb_epochs) :
-          train_loss, train_acc = validate_model(train_loader, model, criterion)
-          train_e_loss.append(train_loss)    
-          train_e_acc.append(train_acc)
-          
-          val_loss, val_acc = validate_model(val_loader, model, criterion)
-          val_e_loss.append(val_loss)    
-          val_e_acc.append(val_acc)
-          print('epoch: {}, train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(epoch, train_loss, val_loss, train_acc, val_acc))
-      
-
-    # for k-fold sets, store loss and accuracy
-    if interstates == False :
-        val_e_loss, val_e_acc = validate_model(val_loader, model, criterion)
-        train_e_loss, train_e_acc = validate_model(train_loader, model, criterion)
-        print('End of fold; train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, sampler=train_sampler, drop_last=False)
+    #     print(len(train_loader))
         
-    val_loss_kfold.append(val_e_loss)    
-    val_acc_kfold.append(val_e_acc)
-
-    train_loss_kfold.append(train_e_loss)
-    train_acc_kfold.append(train_e_acc)
+        val_loader = torch.utils.data.DataLoader(train_dataset, batch_size=mini_batch_size, sampler=val_sampler, drop_last=False)
+    #     print(len(val_loader))
+        
+        model = model_()
+        if torch.cuda.is_available():
+          model = model.cuda()
+          #train_dataset.input, val_dataset.input = train_input.cuda(), train_target.cuda(),test_input.cuda(), test_target.cuda()
+    
+        # Store loss and accuracy per each epoch
+        train_e_loss = []
+        val_e_loss = []
+        train_e_acc = []
+        val_e_acc = []
+        
+        if torch.cuda.is_available():
+          criterion = nn.CrossEntropyLoss().cuda()
+        #optimizer = optim.SGD(model.parameters(), lr)
+        #optimizer = torch.optim.Adam(model.parameters(), lr=lr, betas=(beta1, beta2))
+        if optimizer_ == optim.SGD:
+            optimizer = optimizer_(model.parameters(), *opt_parameters)
+        
+        if optimizer_ == optim.Adam:
+            optimizer = optimizer_(model.parameters(), *opt_parameters[:-1], amsgrad = opt_parameters[-1])
+        
+        for epoch in range(0, nb_epochs):
+          if (epoch%10==0):
+            print('At epoch number: {}'.format(epoch))
+          # for this epoch calculate train loss, accuracy
+          train_model(train_loader, model, criterion, optimizer)
+          # Store them in list to be able to plot
+          if interstates == True and (epoch % 1 == 0 or epoch+1 == nb_epochs) :
+              train_loss, train_acc = validate_model(train_loader, model, criterion)
+              train_e_loss.append(train_loss)    
+              train_e_acc.append(train_acc)
+              
+              val_loss, val_acc = validate_model(val_loader, model, criterion)
+              val_e_loss.append(val_loss)    
+              val_e_acc.append(val_acc)
+              print('epoch: {}, train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(epoch, train_loss, val_loss, train_acc, val_acc))
+          
+    
+        # for k-fold sets, store loss and accuracy
+        if interstates == False :
+            val_e_loss, val_e_acc = validate_model(val_loader, model, criterion)
+            train_e_loss, train_e_acc = validate_model(train_loader, model, criterion)
+            print('End of fold; train loss: {}, val loss: {}, train acc: {}, val acc: {}'.format(train_e_loss, val_e_loss, train_e_acc, val_e_acc))
+            
+        val_loss_kfold.append(val_e_loss)    
+        val_acc_kfold.append(val_e_acc)
+    
+        train_loss_kfold.append(train_e_loss)
+        train_acc_kfold.append(train_e_acc)
 
     
   return train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold
@@ -201,7 +204,7 @@ def train_test(model, optimizer_, opt_parameters, train_dataset, test_dataset, s
   test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=mini_batch_size, drop_last=False)
 #     print(len(val_loader))
 
-  model = create_mnist_model()
+  model = model()
   if torch.cuda.is_available():
     model = model.cuda()
  
