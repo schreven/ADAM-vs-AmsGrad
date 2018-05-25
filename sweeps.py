@@ -37,7 +37,7 @@ def grid_search_lr(model_ = create_1layer_model):
     interstates = False
     run_once = True
     
-    amsgrad = False
+    amsgrad = True
     beta1 = 0.91
     beta2 = 0.999
     
@@ -67,7 +67,7 @@ def grid_search_lr(model_ = create_1layer_model):
         results['train_acc'].append(train_acc_kfold)
         results['val_loss'].append(val_loss_kfold)
         results['val_acc'].append(val_acc_kfold)
-    np.save(os.path.join('arrays_and_images','grid_kf=5_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr_ro_convex'),results)
+    np.save(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr_ro_CONV'),results)
         
         
 

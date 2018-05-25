@@ -126,7 +126,6 @@ def train_validate_kfold(model_, optimizer_, opt_parameters, train_dataset, kfol
     if stop_running != True:
         if run_once:
             stop_running = True
-            print(run_once, stop_running)
         print("Fold number: {}".format(fold_nb))
         fold_nb +=1
         train_sampler = SubsetRandomSampler(train_index)

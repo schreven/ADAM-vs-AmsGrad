@@ -89,6 +89,18 @@ plt.title('Validating accuracy mean')
 """
 
 
+### LR SEARCH AMSGRAD ONE_LAYER
+"""
+#grid_search_lr()
+res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr.npy'))
+res = dict(res.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+num_lr = len(lr_list)
+val_acc = np.mean(res['val_acc'], axis=1)
+plt.figure()
+plt.semilogx(lr_list, val_acc)
+plt.title('Validating accuracy mean')
+"""
 
 ### SIMPLE ADAM ONE_LAYER
 """
@@ -259,8 +271,22 @@ plt.semilogx(lr_list, val_acc)
 plt.title('Validating accuracy mean')
 """
 
-### SIMPLE ADAM CONVEX
+### LR SEARCH AMSGRAD CONVEX
 
+#model = create_convex_model
+#grid_search_lr(model)
+res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr_ro_CONV.npy'))
+res = dict(res.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+num_lr = len(lr_list)
+val_acc = np.mean(res['val_acc'], axis=1)
+plt.figure()
+plt.semilogx(lr_list, val_acc)
+plt.title('Validating accuracy mean')
+
+
+### SIMPLE ADAM CONVEX
+"""
 model = create_convex_model
 kfold = 4
 nb_epochs = 40
@@ -282,11 +308,10 @@ plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold)
 
 save_array = [train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold]
 np.save(os.path.join('arrays_and_images','2nd_kf=4_epo=40_lr=1e-3_btch=100_Adam_inter_ro_CONV_'),save_array)
-
-
+"""
 
 ### Improved ADAM: AMSGRAD CONVEX
-
+"""
 model = create_convex_model
 kfold = 4
 nb_epochs = 40
@@ -308,6 +333,6 @@ plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold)
 
 save_array = [train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold]
 np.save(os.path.join('arrays_and_images','3rd_kf=4_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_ro_CONV_'),save_array)
-
+"""
 
 

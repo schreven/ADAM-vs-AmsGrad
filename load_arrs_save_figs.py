@@ -108,7 +108,7 @@ pylab.savefig(os.path.join('arrays_and_images','sixth_vis.png'))
 
 print('Amsgrad: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
 
-### GRID  beta
+### GRID  beta ADAM
 res = np.load(os.path.join('arrays_and_images','grid_kf=4_epo=40_lr=1e-3_btch=100_Adam_beta1_beta2.npy'))
 res = dict(res.tolist())
 beta1_list = [0.88, 0.89, 0.9, 0.91, 0.92]
@@ -128,7 +128,7 @@ sns.heatmap(val_acc, xticklabels=np.reshape(np.array(beta2_list),(-1,1)), ytickl
 pylab.savefig(os.path.join('arrays_and_images','grid_vis.png'))
 
 
-### GRID LR
+### GRID LR ADAM
 res = np.load(os.path.join('arrays_and_images','grid_kf=4_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr.npy'))
 res = dict(res.tolist())
 lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
@@ -145,6 +145,19 @@ plt.figure()
 plt.semilogx(lr_list[:-1], val_acc[:-1])
 plt.title('Validating accuracy mean')
 pylab.savefig(os.path.join('arrays_and_images','lr_vis_2.png'))
+
+### GRID LR AMSGRAD
+res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr.npy'))
+res = dict(res.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+num_lr = len(lr_list)
+val_acc = np.mean(res['val_acc'], axis=1)
+
+plt.figure()
+plt.semilogx(lr_list, val_acc)
+plt.title('Validating accuracy mean')
+pylab.savefig(os.path.join('arrays_and_images','lr_vis_1_ams.png'))
 
 ########### CONVEX ##########
 
@@ -254,6 +267,54 @@ plt.ylabel('Loss')
 pylab.savefig(os.path.join('arrays_and_images','report_loss_SGD_Adam_AmsGrad_valid_CONV.png'))
 
 
+### LR TUNING ADAM AMSGRAD ONE_LAYER
+
+res_sgd = np.load(os.path.join('arrays_and_images','grid_kf=4_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr.npy'))
+res_sgd = dict(res_sgd.tolist())
+res_adam = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr.npy'))
+res_adam = dict(res_adam.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+num_lr = len(lr_list)
+
+#print(res_sgd1)
+val_acc_sgd = np.mean(res_sgd['val_acc'], axis=1)
+val_acc_adam = res_adam['val_acc']
+
+plt.figure()
+plt.semilogx(lr_list[:-1], val_acc_sgd[:-1])
+plt.semilogx(lr_list[:-1], val_acc_adam[:-1])
+plt.title('Tuning the learning rate')
+plt.legend(['Adam','AmsGrad'])
+plt.xlabel('learning rate')
+plt.ylabel('validation accuracy')
+pylab.savefig(os.path.join('arrays_and_images','report_lr_one_layer.png'))
+
+
+### LR TUNING ADAM AMSGRAD CONV
+
+
+res_sgd = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr_ro_convex.npy'))
+res_sgd = dict(res_sgd.tolist())
+res_adam = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr_ro_CONV.npy'))
+res_adam = dict(res_adam.tolist())
+
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+num_lr = len(lr_list)
+
+val_acc_sgd = res_sgd['val_acc']
+val_acc_adam = res_adam['val_acc']
+
+plt.figure()
+plt.semilogx(lr_list, val_acc_sgd)
+plt.semilogx(lr_list, val_acc_adam)
+plt.title('Tuning the learning rate')
+plt.legend(['Adam','AmsGrad'])
+plt.xlabel('learning rate')
+plt.ylabel('validation accuracy')
+
+pylab.savefig(os.path.join('arrays_and_images','report_lr_convex.png'))
 
 
 
