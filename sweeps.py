@@ -31,7 +31,7 @@ def grid_search_lr(model_ = create_1layer_model):
     
     # Define minibatch size
     kfold = 5
-    nb_epochs = 2
+    nb_epochs = 40
     mini_batch = 100
     train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
     interstates = False
@@ -59,7 +59,7 @@ def grid_search_lr(model_ = create_1layer_model):
             model_, optimizer_, opt_parameters_Adam, train_dataset, kfold=kfold, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates, run_once = run_once)
         # Plot
         
-        plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold , title)
+        #plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold , title)
         print("Train accuracy =  ",train_acc_kfold)
         print("Val accuracy =  ",val_acc_kfold)
         
@@ -107,12 +107,7 @@ def grid_search_beta(model_ = create_1layer_model):
             model_, optimizer_, opt_parameters_Adam, train_dataset, kfold=kfold, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates, run_once = run_once)
         # Plot
     
-        plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold , title)
-        #train_loss_kfold = np.mean(train_loss_kfold, axis = 0)
-        #val_loss_kfold = np.mean(val_loss_kfold, axis = 0)
-        #train_acc_kfold = np.mean(train_acc_kfold, axis = 0)
-        #val_acc_kfold = np.mean(val_acc_kfold, axis = 0)
-        #train_acc_kfold = np.mean(train_acc_kfold, axis = 0)
+        #plot_acc_loss(train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold , title)
         print("Train accuracy =  ",train_acc_kfold)
     
         #te_acc = np.mean(te_acc, axis = 0)

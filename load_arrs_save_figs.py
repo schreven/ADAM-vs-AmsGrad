@@ -146,6 +146,7 @@ plt.semilogx(lr_list[:-1], val_acc[:-1])
 plt.title('Validating accuracy mean')
 pylab.savefig(os.path.join('arrays_and_images','lr_vis_2.png'))
 
+########### CONVEX ##########
 
 ### SGD CONVEX
 save_array = np.load(os.path.join('arrays_and_images','1st_kf=5_epo=40_lr=1e-1_btch=100_SGD_inter_ro_convex.npy'))
@@ -179,9 +180,23 @@ pylab.savefig(os.path.join('arrays_and_images','second_vis_convex.png'))
 print('SGD: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
 
 
+### GRID LR CONVEX 
+res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=120_b1=0.91_b2=0.999_btch=100_Adam_lr_ro_convex.npy'))
+res = dict(res.tolist())
+lr_list = [0.00001, 0.0001, 0.001, 0.01, 0.1]
+
+num_lr = len(lr_list)
+val_acc = np.mean(res['val_acc'], axis=1)
+
+plt.figure()
+plt.semilogx(lr_list, val_acc)
+plt.title('Validating accuracy mean')
+pylab.savefig(os.path.join('arrays_and_images','lr_vis_1_convex.png'))
+
+
 ############# REPORT ####################
 
-### LOSS EPOCH SGD, ADAM, AMSGRAD
+### LOSS EPOCH SGD, ADAM, AMSGRAD  ONE_LAYER
 save_array_sgd = np.load(os.path.join('arrays_and_images','1st_kf=5_epo=40_lr=1e-1_btch=100_SGD_inter.npy'))
 save_array_adam = np.load(os.path.join('arrays_and_images','2nd_kf=4_epo=40_lr=1e-3_btch=100_Adam_inter.npy'))
 save_array_amsgrad = np.load(os.path.join('arrays_and_images','3rd_kf=4_epo=40_lr=1e-3_btch=100_AMSGRAD_inter.npy'))
@@ -209,7 +224,34 @@ plt.ylabel('Loss')
 
 pylab.savefig(os.path.join('arrays_and_images','report_loss_SGD_Adam_AmsGrad_valid.png'))
 
+### LOSS EPOCH SGD, ADAM, AMSGRAD  CONV
 
+save_array_sgd = np.load(os.path.join('arrays_and_images','1st_kf=5_epo=40_lr=1e-1_btch=100_SGD_inter_ro_convex.npy'))
+save_array_adam = np.load(os.path.join('arrays_and_images','2nd_kf=4_epo=40_lr=1e-3_btch=100_Adam_inter_ro_CONV.npy'))
+save_array_amsgrad = np.load(os.path.join('arrays_and_images','3rd_kf=4_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_ro_CONV.npy'))
+
+train_loss_kfold_sgd, val_loss_kfold_sgd, train_acc_kfold_sgd, val_acc_kfold_sgd = save_array_sgd
+train_loss_kfold_adam, val_loss_kfold_adam, train_acc_kfold_adam, val_acc_kfold_adam = save_array_adam
+train_loss_kfold_amsgrad, val_loss_kfold_amsgrad, train_acc_kfold_amsgrad, val_acc_kfold_amsgrad = save_array_amsgrad
+
+plt.figure()
+title="MNIST, convex:"
+plt.title(title)
+
+sns.tsplot(np.array(val_loss_kfold_adam), color = 'b', linestyle = '--')
+sns.tsplot(np.array(val_loss_kfold_amsgrad), color = 'r')
+sns.tsplot(np.array(val_loss_kfold_sgd), color = 'g', linestyle = ':')
+
+sns.tsplot(np.array(train_loss_kfold_adam), color = 'm', linestyle = '--')
+sns.tsplot(np.array(train_loss_kfold_amsgrad), color = 'y')
+sns.tsplot(np.array(train_loss_kfold_sgd), color = 'c', linestyle = ':')
+
+
+plt.legend(['test Adam', 'test Amsgrad', 'test SGD', 'train Adam', 'train Amsgrad', 'train SGD'])
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+
+pylab.savefig(os.path.join('arrays_and_images','report_loss_SGD_Adam_AmsGrad_valid_CONV.png'))
 
 
 
