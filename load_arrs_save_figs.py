@@ -190,7 +190,7 @@ plt.ylabel('Accuracy')
 
 pylab.savefig(os.path.join('arrays_and_images','second_vis_convex.png'))
 
-print('SGD: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
+#print('SGD: {}' .format(np.mean(val_acc_kfold, axis=0)[-1]))
 
 
 ### GRID LR CONVEX 
@@ -317,7 +317,18 @@ plt.ylabel('validation accuracy')
 pylab.savefig(os.path.join('arrays_and_images','report_lr_convex.png'))
 
 
+### TESTING ONE_LAYER SGD, ADAM, AMSGRAD
+res_sgd = np.load(os.path.join('arrays_and_images','4th_epo=40_lr=1e-1_btch=100_SGD_inter_testing.npy'))
+print('Testing one hidden layer with sgd, validation accuracy: {}'.format(res_sgd[3]))
 
+res_adam = np.load(os.path.join('arrays_and_images','5th_epo=40_lr=1e-3_btch=100_Adam_inter_testing.npy'))
+print('Testing one hidden layer with sgd, validation accuracy: {}'.format(res_adam[3]))
+
+res_amsgrad = np.load(os.path.join('arrays_and_images','6th_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_testing.npy'))
+print('Testing one hidden layer with sgd, validation accuracy: {}'.format(res_amsgrad[3]))
+
+
+### TESTING CONVEXvvvv SGD, ADAM, AMSGRAD
 
 
 

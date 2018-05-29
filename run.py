@@ -27,6 +27,9 @@ from training_and_validating import train_validate_kfold, train_test
 from sweeps import grid_search_lr, grid_search_beta
 
 
+### UNCOMMENT RELEVANT BLOCKS FOR REPRODUCTION, RUN load_arrs_save_figs.py
+
+
 
 ######### ONE HIDDEN LAYER MODEL ###############
 
@@ -273,6 +276,7 @@ plt.title('Validating accuracy mean')
 
 ### LR SEARCH AMSGRAD CONVEX
 
+"""
 #model = create_convex_model
 #grid_search_lr(model)
 res = np.load(os.path.join('arrays_and_images','grid_kf=5_epo=40_b1=0.91_b2=0.999_btch=100_AmsGrad_lr_ro_CONV.npy'))
@@ -283,7 +287,7 @@ val_acc = np.mean(res['val_acc'], axis=1)
 plt.figure()
 plt.semilogx(lr_list, val_acc)
 plt.title('Validating accuracy mean')
-
+"""
 
 ### SIMPLE ADAM CONVEX
 """
@@ -315,7 +319,7 @@ np.save(os.path.join('arrays_and_images','2nd_kf=4_epo=40_lr=1e-3_btch=100_Adam_
 model = create_convex_model
 kfold = 4
 nb_epochs = 40
-lr = 1e-4
+lr = 1e-3
 beta1, beta2 = 0.90, 0.999
 amsgrad = True
 mini_batch = 100
@@ -335,4 +339,81 @@ save_array = [train_loss_kfold, val_loss_kfold, train_acc_kfold, val_acc_kfold]
 np.save(os.path.join('arrays_and_images','3rd_kf=4_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_ro_CONV_'),save_array)
 """
 
+
+
+### SGD TESTING CONVEX
+"""
+model = create_convex_model
+nb_epochs = 40
+lr = 1e-1
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+optimizer_ = optim.SGD
+opt_parameters_SGD = [lr]
+
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_SGD, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('SGD test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','4th_epo=40_lr=1e-1_btch=100_SGD_inter_convex_testing'),save_array)
+
+"""
+### ADAM TESTING CONVEX
+"""
+
+model = create_convex_model
+nb_epochs = 40
+lr = 1e-4
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+
+beta1, beta2 = 0.91, 0.999
+amsgrad = False
+optimizer_ = optim.Adam
+opt_parameters_Adam = [lr, (beta1, beta2), amsgrad]
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_Adam, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('ADAM test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','5th_epo=40_lr=1e-3_btch=100_Adam_inter_testing_convex'),save_array)
+"""
+### AMSGRAD TESTING CONVEX
+
+
+model = create_convex_model
+nb_epochs = 40
+lr = 1e-3
+mini_batch = 100
+train_dataset, train_loader, test_dataset, test_loader = get_datasets(mini_batch_size = mini_batch)
+interstates = False
+
+
+beta1, beta2 = 0.91, 0.999
+amsgrad = True
+optimizer_ = optim.Adam
+opt_parameters_Adam = [lr, (beta1, beta2), amsgrad]
+
+train_loss, test_loss, train_acc, test_acc = train_test(\
+        model, optimizer_, opt_parameters_Adam, train_dataset, test_dataset, shuffle=True, nb_epochs = nb_epochs, mini_batch_size = mini_batch, interstates = interstates)
+
+
+#plot_acc_loss(train_loss, test_loss, train_acc, test_acc)
+print('ADAM test accuracy: {}'.format(test_acc))
+
+save_array = [train_loss, test_loss, train_acc, test_acc]
+np.save(os.path.join('arrays_and_images','6th_epo=40_lr=1e-3_btch=100_AMSGRAD_inter_testing_convex'),save_array)
 
