@@ -2,7 +2,7 @@
 """
 Created on Thu May 24 15:59:04 2018
 
-@author: Bob
+@authors: Musluoglu Cem Ates, Novakovic Milica, van Schreven Cyril
 """
 
 import os

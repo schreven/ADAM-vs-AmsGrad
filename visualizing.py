@@ -2,7 +2,7 @@
 """
 Created on Wed May 23 18:21:45 2018
 
-@author: Bob
+@authors: Musluoglu Cem Ates, Novakovic Milica, van Schreven Cyril
 """
 
 import numpy as np

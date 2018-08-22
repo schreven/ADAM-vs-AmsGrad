@@ -2,7 +2,7 @@
 """
 Created on Wed May 23 18:16:08 2018
 
-@author: Bob
+@authors: Musluoglu Cem Ates, Novakovic Milica, van Schreven Cyril
 """
 import torch
 import math

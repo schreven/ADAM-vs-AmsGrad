@@ -2,7 +2,7 @@
 """
 Created on Wed May 23 18:57:41 2018
 
-@author: Bob
+@authors: Musluoglu Cem Ates, Novakovic Milica, van Schreven Cyril
 """
 
 import torch

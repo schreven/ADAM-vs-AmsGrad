@@ -2,7 +2,7 @@
 """
 Created on Wed May 23 21:22:17 2018
 
-@author: Bob
+@authors: Musluoglu Cem Ates, Novakovic Milica, van Schreven Cyril
 """
 
 # -*- coding: utf-8 -*-
