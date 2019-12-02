@@ -27,21 +27,23 @@ import argparse
 ### UNCOMMENT RELEVANT BLOCKS FOR REPRODUCTION, RUN load_arrs_save_figs.py
 
 if __name__ == '__main__':
-    all_code_pieces = [all, sgd_one_layer, grid_search_betas_adam_one_layer, lr_search_adam_one_layer, lr_search_amsgrad_one_layer,\
+    all_code_pieces = '[all, sgd_one_layer, grid_search_betas_adam_one_layer, lr_search_adam_one_layer, lr_search_amsgrad_one_layer,\
     adam_one_layer, amsgrad_one_layer, sgd_testing_one_layer, adam_testing_one_layer, amsgrad_testing_one_layer, \
     sgd_convex, lr_search_adam_convex, lr_search_amsgrad_convex, adam_convex, amsgrad_convex, \
-    sgd_testing_convex, adam_testing_convex, amsgrad_testing_convex]
+    sgd_testing_convex, adam_testing_convex, amsgrad_testing_convex]'
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--code_name', default = 'sgd_one_layer', type=str, help='Name of the piece of code to run'+str(all_code_pieces)'.')
+    parser.add_argument('--code_name', default = 'sgd_one_layer', type=str, help='Name of the piece of code to run'+all_code_pieces+'.')
     args = parser.parse_args()
     code_name = args.code_name
     ######### ONE HIDDEN LAYER MODEL ###############
 
     if code_name not in all_code_pieces:
         print("[ERROR] code_name not valid.")
+    else:
+        print("Running code correponding to: "+str(code_name)+'.')
     ### SIMPLE SGD ONE_LAYER
     if code_name == 'sgd_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         kfold = 5
         nb_epochs = 40
         lr = 1e-1
@@ -110,7 +112,7 @@ if __name__ == '__main__':
 
     ### SIMPLE ADAM ONE_LAYER
     if code_name == 'adam_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         kfold = 4
         nb_epochs = 40
         lr = 1e-3
@@ -135,7 +137,7 @@ if __name__ == '__main__':
 
     ### Improved ADAM: AMSGRAD ONE_LAYER
     if code_name == 'amsgrad_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         kfold = 4
         nb_epochs = 40
         lr = 1e-3
@@ -161,7 +163,7 @@ if __name__ == '__main__':
 
     ### SGD TESTING ONE_LAYER
     if code_name == 'sgd_testing_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         nb_epochs = 40
         lr = 1e-1
         mini_batch = 100
@@ -184,7 +186,7 @@ if __name__ == '__main__':
 
     ### ADAM TESTING ONE_LAYER
     if code_name == 'adam_testing_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         nb_epochs = 40
         lr = 1e-3
         mini_batch = 100
@@ -210,7 +212,7 @@ if __name__ == '__main__':
     ### AMSGRAD TESTING ONE_LAYER
 
     if code_name == 'amsgrad_testing_one_layer' or code_name == 'all':
-        model = create_1layer_model()
+        model = create_1layer_model
         nb_epochs = 40
         lr = 1e-3
         mini_batch = 100
